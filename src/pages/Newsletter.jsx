@@ -1,5 +1,32 @@
+import { Form, redirect, useNavigation } from "react-router-dom";
+import axios from 'axios';
+import { toast } from "react-toastify";
+
+const newsletterUrl = 'https://jsonplaceholder.typicode.com/posts'
+
+export const action = async({request})=>{
+    const formData = await request.formData()  
+    const data = Object.fromEntries(formData)
+
+try  {
+    const response = await axios.post(newsletterUrl, data)
+    console.log(response)
+    toast.success(response.data.msg)
+    return redirect('/')
+} catch(error){
+    console.log(error)
+    toast.error(error?.response?.data?.msg)
+    return error
+}
+  
+}
+
+
 const Newsletter =() => {
-    return <form className = 'form'>
+    const navigation = useNavigation
+    const isSubmitting = navigation.state === 'submitting'
+    return (
+    <Form className = 'form' method='post'>
         <h4 style={{textAlign:'center', marginBottom: '2rem'}}>
             our newsletter
         </h4>
@@ -13,8 +40,8 @@ const Newsletter =() => {
                 className="form-input "
                 name="name"
                 id="name"
-                defaultValue='Astro'
-                 />
+                required
+                />
         </div>
         {/* lastName */}
         <div className="form-row">
@@ -26,7 +53,7 @@ const Newsletter =() => {
                 className="form-input "
                 name="lastName"
                 id="lastName"
-                defaultValue='Astro'
+                required
                  />
         </div>
          {/* email */}
@@ -39,26 +66,17 @@ const Newsletter =() => {
                 className="form-input "
                 name="email"
                 id="email"
-                defaultValue='Corgi@badboy.com'
+                required
                  />
         </div>
-         {/* name */}
-         <div className="form-row">
-            <label htmlFor="name" className='form-label'>
-                name
-            </label>
-            <input
-                type="text"
-                className="form-input "
-                name="name"
-                id="name"
-                defaultValue='Poop'
-                 />
-        </div>
-        <button type="submit" className="btn btn-block" style={{marginTop: '0.5rem'}}>
-            submit
+              <button type="submit"
+               className="btn btn-block"
+               style={{marginTop: '0.5rem'}}
+               disable={isSubmitting}
+               >
+            {isSubmitting ? 'submitting' : 'submit'}
         </button>
-    </form>
-}
+    </Form>
+)}
 
 export default Newsletter;
